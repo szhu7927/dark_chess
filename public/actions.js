@@ -3,13 +3,10 @@ function move(data) {
   var from = document.getElementById(data.from);
   var to = document.getElementById(data.to);
 
-  //console.log(data.from, data.to);
-  //console.log(from, to);
   $(to).append(from.children[0]);
 
   //Capture piece
   if(to.children.length > 1) {
-    console.log("capture");
     to.children[0].remove();
   }
 
@@ -26,9 +23,7 @@ function move(data) {
         if(document.getElementById("player") == 1) {
           document.getElementById("wking_moved").value = "1";
           if(data.from == "td85" && data.to == "td87" && document.getElementById("wrookk_moved").value == 0) {
-            //console.log($(document.getElementById("td88").children)[0]);
             $(document.getElementById("td86")).append($(document.getElementById("td88").children[0]));
-            //console.log("white castled");
           } else if(data.from == "td85" && data.to == "td83" && document.getElementById("wrookk_moved").value == 0) {
             $(document.getElementById("td84")).append($(document.getElementById("td81").children[0]));
           }
@@ -94,7 +89,6 @@ function move(data) {
 
   //Update player's turn
   if(data.team == "white") {
-    console.log('white moved')
     document.getElementById("turn").value = "Black's turn to move";
     if(document.getElementById("player").value == 1) $(document.getElementById("w_board")).css("border-color", "#53b0a2");
     else $(document.getElementById("b_board")).css("border-color", "#53b0a2");
@@ -175,7 +169,6 @@ $(function() {
 
       moves = valid_moves(piece, from_td, team, enemy_pos, ally_pos);
       possible_moves_arr = [];
-      console.log(piece);
 
       //Highlight squares based on type of piece
       var ind = 0;
@@ -204,7 +197,6 @@ $(function() {
 
       //Prevent same team collisions
       if(event.target.children.length > 0 && $(ui.draggable[0]).attr("team") == $(event.target.children[0]).attr("team")) {
-        console.log("collision");
         //Revert move highlights
         for(var i = 11; i <= 88; i++) {
           if(possible_moves_arr[i] != null) {
@@ -217,10 +209,8 @@ $(function() {
 
       //Get piece type, start and end location of piece
       td = $(this).attr("id");
-      console.log(from_td, td);
 
       //Prevent invalid moves
-      //console.log(orig_colors[td.substring(2)]);
       var ind1 = 0;
       var is_valid = false;
       while(moves[ind1] != null) {
@@ -278,7 +268,6 @@ $(function() {
 
 function update_vision(piece, team, from_td, td, enemy_pos, ally_pos) {
   //Create highlighted array
-  //console.log(enemy_pos);
   var highlight_arr = [];
   for(var i = 11; i <= 88; i++) {
     if((i % 10) < 9 && (i % 10) > 0 && ((ally_pos[i] && i != from_td.substring(2)) || i == td.substring(2))) {
@@ -290,26 +279,16 @@ function update_vision(piece, team, from_td, td, enemy_pos, ally_pos) {
         temp_team = team;
       }
 
-      /*if(piece == "") {
-        enemy_pos[from_td] = null;
-        enemy_pos[td] = true;
-        console.log('true');
-      }*/
-
       var highlights = valid_highlight(temp_piece, "td".concat(i), temp_team, enemy_pos, ally_pos);
-
-      //console.log(temp_piece, "td".concat(i), temp_team, highlights);
 
       var ind2 = 0;
       while(highlights[ind2] != null) {
-        //console.log(i, temp_piece, highlights[ind2]);
         highlight_arr[highlights[ind2]] = true;
         ind2++;
       }
       highlight_arr[i] = true;
     }
   }
-  console.log("next");
 
   //Highlight hidden tiles, hide images
   for(var i = 11; i <= 88; i++) {
@@ -342,9 +321,11 @@ function is_promote_ready(piece, team, td) {
   if(piece == "pawn") {
     switch(team) {
       case "white":
-        //console.log("promote", td);
         if(td.substring(2) >= 11 && td.substring(2) <= 18) {
-          console.log("Promote!");
+          return true;
+        }
+      case "black":
+        if(td.substring(2) >= 71 && td.substring(2) <= 78) {
           return true;
         }
     }
@@ -352,23 +333,13 @@ function is_promote_ready(piece, team, td) {
 }
 
 function promote(team, td) {
-  //console.log("PROMOTE", $(document.getElementById(td).children[0]).attr("type"));
   $(document.getElementById(td).children[0]).attr("type", "queen");
   switch(team) {
     case "white":
-      $(document.getElementById(td).children[0]).attr("src", "wqueen.png");
+      $(document.getElementById(td).children[0]).attr("src", "/pieces/wqueen.png");
       break;
     case "black":
-      $(document.getElementById(td).children[0]).attr("src", "bqueen.png");
+      $(document.getElementById(td).children[0]).attr("src", "/pieces/bqueen.png");
       break;
   }
 }
-
-/*
-function snapToMiddle(dragger, target){
-  var offset = target.offset();
-  var topMove = (target.outerHeight(true) - dragger.outerHeight(true)) / 2;
-  var leftMove= (target.outerWidth(true) - dragger.outerWidth(true)) / 2;
-  dragger.offset({ top: topMove + offset.top, left: leftMove + offset.left })
-}
-*/
